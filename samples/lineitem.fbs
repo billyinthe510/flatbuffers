@@ -1,0 +1,32 @@
+// Written by Billy Lai
+// 5/6/18
+// IDL file for our LineItem schema
+
+namespace Tables;
+
+struct Date {
+	year:short;
+	month:short;
+	day:short;
+}
+
+table LINEITEM {
+	L_ORDERKEY:int;
+	L_PARTKEY:int;
+	L_SUPPKEY:int;
+	L_LINENUMBER:int;
+	L_QUANTITY:float;
+	L_EXTENDEDPRICE:float;
+	L_DISCOUNT:float;
+	L_TAX:float;
+	L_RETURNFLAG:byte;
+	L_LINESTATUS:byte;
+	L_SHIPDATE:Date;
+	L_COMMITDATE:Date;
+	L_RECEIPTDATE:Date;
+	L_SHIPINSTRUCT:string;
+	L_SHIPMODE:string;
+	L_COMMENT:string;
+}
+
+root_type LINEITEM;
