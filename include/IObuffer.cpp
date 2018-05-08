@@ -3,6 +3,8 @@
 // Reading and Writing LineItem FlatBuffers
 
 #include <iostream>
+#include <sys/time.h>
+#include <ctime>
 #include "lineitem_generated.h"
 
 using namespace Tables;
@@ -34,9 +36,22 @@ int main()
 	// 'Finish()' on the 'FlatBufferBuilder'
 	builder.Finish(firstItem); // Could also call 'FinishLINEITEMBuffer(builder, firstItem);
 
+	struct timeval start, end;
+	double t;
+
 	uint8_t *buf = builder.GetBufferPointer();
 	int size = builder.GetSize();
 	std::cout<<size<<std::endl;
+
+	gettimeofday(&start, NULL);
+	auto item = GetLINEITEM(buf);
+	gettimeofday(&end, NULL);
+
+	assert(strcmp(item->L_SHIPINSTRUCT()->c_str(),"Use lots of tape")==0);
+	
+	t = (double) ((end.tv_sec * 1000000 + end.tv_usec) - (start.tv_sec * 1000000 + start.tv_usec));
+
+	std::cout<<"Reading LINEITEM took "<< t<< " microseconds"<<std::endl;
 
 	return 0;
 }
