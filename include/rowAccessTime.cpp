@@ -31,7 +31,6 @@ int main()
 	std::getline(inFile, row);
 	inFile.close();
 	// Split by '|' deliminator
-	std::cout<<row<<std::endl;
 	std::vector<std::string> parsedRow = split(row, '|');
 	
 // ------------------------------------------------------------------------Initialize FlatBuffer ----------------------------------------
@@ -76,10 +75,15 @@ int main()
 
 	uint8_t *buf = builder.GetBufferPointer();
 	int size = builder.GetSize();
-	std::cout<<"Buffer Size: "<<size<<std::endl;
+	std::cout<<"Buffer Size: "<<size<<endl<<endl;
 
 	auto item = GetLINEITEM(buf);
-	const flatbuffers::String * _comment;
+
+	int32_t _orderkey, _partkey, _suppkey, _linenumber;
+	float _quantity, _extendedprice, _discount, _tax;
+	int8_t _returnflag, _linestatus;
+	const Tables::Date* _shipdate, *_commitdate, *_receiptdate;
+	const flatbuffers::String*  _shipinstruct, *_shipmode, *_comment;
 
 	double avg = 0;
 	double avg2 = 0;
@@ -87,7 +91,22 @@ int main()
 		for(int i=0;i<100;i++) {
 			gettimeofday(&start, NULL);
 			item = GetLINEITEM(buf);
-			for(int i=0;i<100000;i++) {
+			for(int i=0;i<1000;i++) {
+				_orderkey = item->L_ORDERKEY();
+				_partkey = item->L_PARTKEY();
+				_suppkey = item->L_SUPPKEY();
+				_linenumber = item->L_LINENUMBER();
+				_quantity = item->L_QUANTITY();
+				_extendedprice = item->L_EXTENDEDPRICE();
+				_discount = item->L_DISCOUNT();
+				_tax = item->L_TAX();
+				_returnflag = item->L_RETURNFLAG();
+				_linestatus = item->L_LINESTATUS();
+				_shipdate = item->L_SHIPDATE();
+				_commitdate = item->L_COMMITDATE();
+				_receiptdate = item->L_RECEIPTDATE();
+				_shipinstruct = item->L_SHIPINSTRUCT();
+				_shipmode = item->L_SHIPMODE();
 				_comment = item->L_COMMENT();
 			}
 			gettimeofday(&end, NULL);
@@ -95,13 +114,25 @@ int main()
 			t = (double) ((end.tv_sec * 1000000 + end.tv_usec) - (start.tv_sec * 1000000 + start.tv_usec));
 		avg += t;
 		}
-		avg /= 100;
+		avg /= 1000;
 		avg2 += avg;
 	}
 	avg2/=10;
-	cout<<_comment->str()<<endl;
 	std::cout<<"Reading LINEITEM took "<< avg2<< " microseconds"<<std::endl;
 
+// ------------------------------------------------- DOUBLE CHECKING CONTENTS OF LINEITEM IN BUFFER -----------------------------------
+	assert(_orderkey == orderkey);
+	assert(_partkey == partkey);
+	assert(_suppkey == suppkey);
+	assert(_linenumber == linenumber);
+	
+	assert(_quantity == quantity);
+	assert(_extendedprice == extendedprice);
+	assert(_discount == discount);
+	assert(_tax == tax);
+	
+	assert(_returnflag == returnflag);
+	assert(_linestatus == linestatus);
 
 	assert(strcmp(item->L_SHIPINSTRUCT()->c_str(),parsedRow[13].c_str()) ==0);
 	assert(strcmp(item->L_SHIPMODE()->c_str(),parsedRow[14].c_str()) ==0);
