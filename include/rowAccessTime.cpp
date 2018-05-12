@@ -34,14 +34,6 @@ int main()
 	std::cout<<row<<std::endl;
 	std::vector<std::string> parsedRow = split(row, '|');
 	
-	// Check Parsed Row
-	cout<<endl;
-	cout<<"Checking Parsed Row"<<endl;
-	for(int i=0;i< (int)parsedRow.size();i++)
-		std::cout<<parsedRow[i]<<"|";
-	cout<<endl;
-	cout<<"Done checking row"<< endl<<endl;
-	
 // ------------------------------------------------------------------------Initialize FlatBuffer ----------------------------------------
 	//	 Create a 'FlatBufferBuilder', which will be used to create our LINEITEM FlatBuffers
 	flatbuffers::FlatBufferBuilder builder(1024);
@@ -86,12 +78,29 @@ int main()
 	int size = builder.GetSize();
 	std::cout<<"Buffer Size: "<<size<<std::endl;
 
-	gettimeofday(&start, NULL);
 	auto item = GetLINEITEM(buf);
-	gettimeofday(&end, NULL);
+	const flatbuffers::String * _comment;
 
-	t = (double) ((end.tv_sec * 1000000 + end.tv_usec) - (start.tv_sec * 1000000 + start.tv_usec));
-	std::cout<<"Reading LINEITEM took "<< t<< " microseconds"<<std::endl;
+	double avg = 0;
+	double avg2 = 0;
+	for(int k=0;k<10;k++) {
+		for(int i=0;i<100;i++) {
+			gettimeofday(&start, NULL);
+			item = GetLINEITEM(buf);
+			for(int i=0;i<100000;i++) {
+				_comment = item->L_COMMENT();
+			}
+			gettimeofday(&end, NULL);
+			
+			t = (double) ((end.tv_sec * 1000000 + end.tv_usec) - (start.tv_sec * 1000000 + start.tv_usec));
+		avg += t;
+		}
+		avg /= 100;
+		avg2 += avg;
+	}
+	avg2/=10;
+	cout<<_comment->str()<<endl;
+	std::cout<<"Reading LINEITEM took "<< avg2<< " microseconds"<<std::endl;
 
 
 	assert(strcmp(item->L_SHIPINSTRUCT()->c_str(),parsedRow[13].c_str()) ==0);
