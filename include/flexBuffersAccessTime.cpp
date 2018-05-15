@@ -77,26 +77,21 @@ int main()
 	int size = builder.GetSize();
 	std::cout<<"Buffer Size: "<<size<<endl<<endl;
 
-	volatile auto item = GetLINEITEM(buf);
+	auto item = GetLINEITEM(buf);
 
-	volatile int32_t _orderkey, _partkey, _suppkey, _linenumber;
-	volatile float _quantity, _extendedprice, _discount, _tax;
-	volatile int8_t _returnflag, _linestatus;
+	int32_t _orderkey, _partkey, _suppkey, _linenumber;
+	float _quantity, _extendedprice, _discount, _tax;
+	int8_t _returnflag, _linestatus;
 	const Tables::Date* _shipdate, *_commitdate, *_receiptdate;
 	const flatbuffers::String*  _shipinstruct, *_shipmode, *_comment;
 
 	double avg = 0;
 	double avg2 = 0;
-	int n = 1000000;
-	int n2 = 10;
-	double minN = 1000000;
-	double maxN = 0;
-	// READ A ROW
-		for(int i=0;i<n2;i++) {
-			avg = 0;
+	for(int k=0;k<10;k++) {
+		for(int i=0;i<100;i++) {
 			gettimeofday(&start, NULL);
-			for(int i=0;i<n;i++) {
-				item = GetLINEITEM(buf);
+			item = GetLINEITEM(buf);
+			for(int i=0;i<1000;i++) {
 				_orderkey = item->L_ORDERKEY();
 				_partkey = item->L_PARTKEY();
 				_suppkey = item->L_SUPPKEY();
@@ -117,134 +112,13 @@ int main()
 			gettimeofday(&end, NULL);
 			
 			t = (double) ((end.tv_sec * 1000000 + end.tv_usec) - (start.tv_sec * 1000000 + start.tv_usec));
-			avg += t;
-			avg /= n;
-			minN = minN<avg?minN:avg;
-			maxN = maxN>avg?maxN:avg;
-			avg2 += avg;
-		}
-		avg2 /= n2;
-	std::cout<<"Reading LINEITEM took "<< avg2<< " microseconds over "<<n<<" runs"<<std::endl;
-	cout<<"Reading ROW: minAccessTime- "<<minN<<" maxAccessTime- "<<maxN<<endl<<endl;
-
-	// READ AN INT:
-	avg = 0;
-	avg2 = 0;
-	minN = 1000000;
-	maxN = 0;
-	for(int j=0;j<n2;j++) {
-		avg = 0;
-		gettimeofday(&start, NULL);
-		for(int i=0;i<n;i++) {
-			item = GetLINEITEM(buf);
-			_suppkey = item->L_SUPPKEY();
-		}
-		gettimeofday(&end, NULL);
-		t = (double) ((end.tv_sec * 1000000 + end.tv_usec) - (start.tv_sec * 1000000 + start.tv_usec));
 		avg += t;
-		avg /= n;
-		minN = minN<avg?minN:avg;
-		maxN = maxN>avg?maxN:avg;
+		}
+		avg /= 1000;
 		avg2 += avg;
 	}
-	avg2 /= n2;
-	cout<<"READING INT took "<<avg2<<" microseconds over "<<n<<" runs"<<endl;
-	cout<<"Reading INT:minAccessTime- "<<minN<<" maxAccessTime- "<<maxN<<endl<<endl;
-
-	// READ A FLOAT
-	avg = 0;
-	avg2 = 0;
-	minN = 1000000;
-	maxN = 0;
-	for(int j=0;j<n2;j++) {
-		avg = 0;
-		gettimeofday(&start, NULL);
-		for(int i=0;i<n;i++) {
-			item = GetLINEITEM(buf);
-			_quantity = item->L_QUANTITY();
-		}
-		gettimeofday(&end, NULL);
-		t = (double) ((end.tv_sec * 1000000 + end.tv_usec) - (start.tv_sec * 1000000 + start.tv_usec));
-		avg += t;
-		avg /= n;
-		minN = minN<avg?minN:avg;
-		maxN = maxN>avg?maxN:avg;
-		avg2 += avg;
-	}
-	avg2 /= n2;
-	cout<<"READING FLOAT took "<<avg2<<" microseconds over "<<n<<" runs"<<endl;
-	cout<<"Reading FLOAT:minAccessTime- "<<minN<<" maxAccessTime- "<<maxN<<endl<<endl;
-
-	// READ A BYTE:
-	avg = 0;
-	avg2 = 0;
-	minN = 1000000;
-	maxN = 0;
-	for(int j=0;j<n2;j++) {
-		avg = 0;
-		gettimeofday(&start, NULL);
-		for(int i=0;i<n;i++) {
-			item = GetLINEITEM(buf);
-			_returnflag = item->L_RETURNFLAG();
-		}
-		gettimeofday(&end, NULL);
-		t = (double) ((end.tv_sec * 1000000 + end.tv_usec) - (start.tv_sec * 1000000 + start.tv_usec));
-		avg += t;
-		avg /= n;
-		minN = minN<avg?minN:avg;
-		maxN = maxN>avg?maxN:avg;
-		avg2 += avg;
-	}
-	avg2 /= n2;
-	cout<<"READING BYTE took "<<avg2<<" microseconds over "<<n<<" runs"<<endl;
-	cout<<"Reading BYTE:minAccessTime- "<<minN<<" maxAccessTime- "<<maxN<<endl<<endl;
-	// READ A DATE STRUCT:
-	avg = 0;
-	avg2 = 0;
-	minN = 1000000;
-	maxN = 0;
-	for(int j=0;j<n2;j++) {
-		avg = 0;
-		gettimeofday(&start, NULL);
-		for(int i=0;i<n;i++) {
-			item = GetLINEITEM(buf);
-			_shipdate = item->L_SHIPDATE();
-		}
-		gettimeofday(&end, NULL);
-		t = (double) ((end.tv_sec * 1000000 + end.tv_usec) - (start.tv_sec * 1000000 + start.tv_usec));
-		avg += t;
-		avg /= n;
-		minN = minN<avg?minN:avg;
-		maxN = maxN>avg?maxN:avg;
-		avg2 += avg;
-	}
-	avg2 /= n2;
-	cout<<"READING DATE took "<<avg2<<" microseconds over "<<n<<" runs"<<endl;
-	cout<<"Reading DATE:minAccessTime- "<<minN<<" maxAccessTime- "<<maxN<<endl<<endl;
-
-	// READ A STRING:
-	avg = 0;
-	avg2 = 0;
-	minN = 1000000;
-	maxN = 0;
-	for(int j=0;j<n2;j++) {
-		avg = 0;
-		gettimeofday(&start, NULL);
-		for(int i=0;i<n;i++) {
-			item = GetLINEITEM(buf);
-			_comment = item->L_COMMENT();
-		}
-		gettimeofday(&end, NULL);
-		t = (double) ((end.tv_sec * 1000000 + end.tv_usec) - (start.tv_sec * 1000000 + start.tv_usec));
-		avg += t;
-		avg /= n;
-		minN = minN<avg?minN:avg;
-		maxN = maxN>avg?maxN:avg;
-		avg2 += avg;
-	}
-	avg2 /= n2;
-	cout<<"READING STRING took "<<avg2<<" microseconds over "<<n<<" runs"<<endl;
-	cout<<"Reading STRING:minAccessTime- "<<minN<<" maxAccessTime- "<<maxN<<endl<<endl;
+	avg2/=10;
+	std::cout<<"Reading LINEITEM took "<< avg2<< " microseconds"<<std::endl;
 
 // ------------------------------------------------- DOUBLE CHECKING CONTENTS OF LINEITEM IN BUFFER -----------------------------------
 	assert(_orderkey == orderkey);
@@ -256,10 +130,13 @@ int main()
 	assert(_extendedprice == extendedprice);
 	assert(_discount == discount);
 	assert(_tax == tax);
-
+	
 	assert(_returnflag == returnflag);
 	assert(_linestatus == linestatus);
 
+	assert(strcmp(item->L_SHIPINSTRUCT()->c_str(),parsedRow[13].c_str()) ==0);
+	assert(strcmp(item->L_SHIPMODE()->c_str(),parsedRow[14].c_str()) ==0);
+	assert(strcmp(item->L_COMMENT()->c_str(),parsedRow[15].c_str()) ==0);
 
 	return 0;
 }
